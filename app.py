@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
@@ -13,6 +12,7 @@ def init_db():
     c.execute('''
         CREATE TABLE IF NOT EXISTS votes (
             student_id TEXT PRIMARY KEY,
+            student_name TEXT,
             head_boy TEXT,
             head_girl TEXT,
             asst_head_boy TEXT,
@@ -31,7 +31,6 @@ candidates = {
         {"name": "Joe J Vazhapilly", "image": "Joe.jpg"},
         {"name": "Nikhil Krishna T.S", "image": "Nikhil.jpg"},
         {"name": "Rishikesh R Menon", "image": "Rishikesh.jpg"}
-        
     ],
     "head_girl": [
         {"name": "Anshika Anoop", "image": "Anshika.jpg"},
@@ -43,7 +42,7 @@ candidates = {
     "asst_head_boy": [
         {"name": "Abhimanyu V.K", "image": "Abhimanyu.jpg"},
         {"name": "Aimon Anoop", "image": "Aimon.jpg"},
-         {"name": "Antony B Kuttikkatt", "image": "Antony.jpg"},
+        {"name": "Antony B Kuttikkatt", "image": "Antony.jpg"},
         {"name": "Neerad s Menon", "image": "Neerad.jpg"}
     ],
     "asst_head_girl": [
@@ -55,13 +54,15 @@ candidates = {
 
 @app.route('/')
 def home():
-    return render_template('login.html')
+    return render_template('login.html', school_name="Christ Vidyanikethann")
 
 @app.route('/vote', methods=['POST'])
 def vote():
     student_id = request.form['student_id']
-    if not student_id:
-        return "Student ID required", 400
+    student_name = request.form['student_name']
+
+    if not student_id or not student_name:
+        return "Student ID and Name required", 400
 
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -71,15 +72,17 @@ def vote():
         return render_template('already_voted.html')
 
     session['student_id'] = student_id
+    session['student_name'] = student_name
     conn.close()
     return render_template('voting.html', candidates=candidates, school_name="Christ Vidyanikethann")
 
 @app.route('/submit_vote', methods=['POST'])
 def submit_vote():
-    if 'student_id' not in session:
+    if 'student_id' not in session or 'student_name' not in session:
         return redirect(url_for('home'))
 
     student_id = session['student_id']
+    student_name = session['student_name']
     head_boy = request.form['head_boy']
     head_girl = request.form['head_girl']
     asst_head_boy = request.form['asst_head_boy']
@@ -88,14 +91,14 @@ def submit_vote():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute('''
-        INSERT INTO votes (student_id, head_boy, head_girl, asst_head_boy, asst_head_girl)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (student_id, head_boy, head_girl, asst_head_boy, asst_head_girl))
+        INSERT INTO votes (student_id, student_name, head_boy, head_girl, asst_head_boy, asst_head_girl)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (student_id, student_name, head_boy, head_girl, asst_head_boy, asst_head_girl))
     conn.commit()
     conn.close()
 
-    session.pop('student_id', None)
-    return render_template('thanks.html')
+    session.clear()
+    return render_template('thanks.html', school_name="Christ Vidyanikethann")
 
 @app.route('/admin')
 def admin_login():

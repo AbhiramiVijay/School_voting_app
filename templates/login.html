@@ -1,48 +1,91 @@
 <!DOCTYPE html>
 <html>
-<head><title>Student Login</title></head>
- <style>
+<head>
+  <title>Student Login</title>
+  <style>
     body {
       background-color: #f7f9fc;
       font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
       padding: 0;
+      text-align: center;
     }
+
+    .admin-top-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #555;
+      color: white;
+      padding: 6px 12px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 999;
+    }
+
+    .admin-top-btn:hover {
+      background-color: #333;
+    }
+
     .header {
       margin-top: 20px;
     }
+
     .header img {
       height: 120px;
     }
+
     .container {
       max-width: 600px;
       margin: auto;
       padding: 20px;
     }
+
     form {
       margin-top: 20px;
     }
+
     input, button {
       padding: 10px;
       margin: 10px 0;
       width: 80%;
       max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
     }
   </style>
 </head>
 <body>
-  <div style="text-align:center;">
-    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="School Logo" height="80">
+
+  <!-- Admin Login Button as Link -->
+  <a href="/admin" class="admin-top-btn">Admin Login</a>
+
+  <div class="header">
+    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="School Logo">
     <h1>{{ school_name }}</h1>
     <hr>
-</div>
+  </div>
 
-  <h2>Enter Your Student ID</h2>
-  <form method="POST" action="/vote">
-    <input type="text" name="student_id" placeholder="Student ID" required><br><br>
-    <input type="text" name="student_name" placeholder="Student Name" required><br><br>
-    <button type="submit">Login</button>
-  </form>
+  <div class="container">
+    <h2>Enter Your Details to Vote</h2>
+    <form method="POST" action="/vote">
+      <input type="text" name="student_id" placeholder="Student ID" required><br>
+      <input type="text" name="student_name" placeholder="Student Name" required><br>
+      <button type="submit">Login to Vote</button>
+    </form>
+  </div>
+
 </body>
 </html>
