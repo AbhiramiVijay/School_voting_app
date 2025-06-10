@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voting Page - Christ Vidyanikethan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f5f9;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+    img.logo {
+      width: 100px;
+      margin-top: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-top: 40px;
+      color: #34495e;
+    }
+    .candidate {
+      display: inline-block;
+      margin: 15px;
+      text-align: center;
+    }
+    .candidate img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #ccc;
+    }
+    .candidate label {
+      display: block;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+    .submit-btn {
+      margin-top: 30px;
+      padding: 10px 30px;
+      font-size: 18px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .submit-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+
+
+
+
+<body>
+  <img src="{{ url_for('static', filename='logo.jpg') }}" class="logo" alt="School Logo">
+  <div class="container">
+    <h1>{{ school_name }}</h1>
+    <p>Please select your candidates</p>
+    <form method="POST" action="/submit_vote">
+      {% for position, candidate_list in candidates.items() %}
+        <h2>{{ position.replace('_', ' ').title() }}</h2>
+        {% for candidate in candidate_list %}
+          <div class="candidate">
+            <img src="{{ url_for('static', filename=candidate.image) }}" alt="{{ candidate.name }}">
+            <label>
+              <input type="radio" name="{{ position }}" value="{{ candidate.name }}" required>
+              {{ candidate.name }}
+            </label>
+          </div>
+        {% endfor %}
+      {% endfor %}
+      <br><br>
+      <button type="submit" class="submit-btn">Submit Vote</button>
+    </form>
+  </div>
+</body>
+</html>

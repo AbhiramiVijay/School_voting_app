@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Thank You</title>
+  <script>
+    setTimeout(function() {
+      window.location.href = "{{ url_for('home') }}"; // redirects to '/'
+    }, 3000);
+  </script>
+</head>
+<body>
+  <div style="text-align:center;">
+     <img src="{{ url_for('static', filename='logo.jpg') }}" class="logo" alt="School Logo">
+    <h1>{{ school_name }}</h1>
+    <hr>
+  </div>
+
+  <h2>Thank you for voting!</h2>
+</body>
+</html>

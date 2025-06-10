@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Election Results</title>
+</head>
+<body>
+    <h1>Election Results - {{ school_name or "Your School" }}</h1>
+
+    {% for position in positions %}
+        <h2>{{ position.replace('_', ' ').title() }}</h2>
+        <ul>
+        {% for candidate, count in results[position] %}
+            <li>{{ candidate }} — {{ count }} votes</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>
