@@ -5,12 +5,12 @@
   <script>
     setTimeout(function() {
       window.location.href = "{{ url_for('home') }}"; // redirects to '/'
-    }, 3000);
+    }, 2000);
   </script>
 </head>
 <body>
   <div style="text-align:center;">
-     <img src="{{ url_for('static', filename='logo.jpg') }}" class="logo" alt="School Logo">
+     <img src="{{ url_for('static', filename='image/logo.jpg') }}" class="logo" alt="School Logo">
     <h1>{{ school_name }}</h1>
     <hr>
   </div>

@@ -3,5 +3,10 @@
 <head><title>Already Voted</title></head>
 <body>
   <h2>You have already voted. Thank you!</h2>
+  <script>
+    setTimeout(function() {
+      window.location.href = "{{ url_for('home') }}"; // redirects to '/'
+    }, 2000);
+  </script>
 </body>
 </html>
