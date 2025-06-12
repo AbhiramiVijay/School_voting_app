@@ -62,15 +62,11 @@
     }
   </style>
 </head>
-
-
-
-
 <body>
   <img src="{{ url_for('static', filename='logo.jpg') }}" class="logo" alt="School Logo">
   <div class="container">
     <h1>{{ school_name }}</h1>
-    <p>Please select your candidates</p>
+    <h2>Please select your candidates  {{ student_name }}</h2>
     <form method="POST" action="/submit_vote">
       {% for position, candidate_list in candidates.items() %}
         <h2>{{ position.replace('_', ' ').title() }}</h2>

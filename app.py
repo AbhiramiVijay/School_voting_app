@@ -1,30 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
+import pandas as pd  # Excel reading
 
 app = Flask(__name__)
 app.secret_key = 'secret123'
 
-# Ensure database exists
-def init_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS votes (
-            student_id TEXT PRIMARY KEY,
-            student_name TEXT,
-            head_boy TEXT,
-            head_girl TEXT,
-            asst_head_boy TEXT,
-            asst_head_girl TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-init_db()
-
-# Candidate list for each position
+# Candidate list
 candidates = {
     "head_boy": [
         {"name": "Francis Xavier K.T", "image": "Francis.jpg"},
@@ -58,12 +40,24 @@ def home():
 
 @app.route('/vote', methods=['POST'])
 def vote():
-    student_id = request.form['student_id']
-    student_name = request.form['student_name']
+    student_id = request.form['student_id'].strip()
+    student_name = request.form['student_name'].strip()
 
-    if not student_id or not student_name:
-        return "Student ID and Name required", 400
+    # ✅ Validate using Excel file (only student_id)
+    try:
+        df = pd.read_excel('students.xls', engine='xlrd')
+        valid_ids = set(str(row['student_id']).strip() for _, row in df.iterrows())
+        if student_id not in valid_ids:
+            return "Invalid Admission ID", 403
 
+        # Optional: Auto-fetch correct name
+        student_row = df[df['student_id'].astype(str).str.strip() == student_id]
+        if not student_row.empty:
+            student_name = student_row.iloc[0]['student_name']
+    except Exception as e:
+        return f"Error reading student list: {e}", 500
+
+    # Check if already voted
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute("SELECT * FROM votes WHERE student_id = ?", (student_id,))
@@ -74,7 +68,7 @@ def vote():
     session['student_id'] = student_id
     session['student_name'] = student_name
     conn.close()
-    return render_template('voting.html', candidates=candidates, school_name="Christ Vidyanikethann")
+    return render_template('voting.html', candidates=candidates, school_name="Christ Vidyanikethann", student_name=student_name)
 
 @app.route('/submit_vote', methods=['POST'])
 def submit_vote():
@@ -112,15 +106,31 @@ def results():
 
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-
     results = {}
     positions = ["head_boy", "head_girl", "asst_head_boy", "asst_head_girl"]
     for position in positions:
         c.execute(f"SELECT {position}, COUNT(*) FROM votes GROUP BY {position}")
         results[position] = c.fetchall()
-
     conn.close()
     return render_template('results.html', results=results, positions=positions, school_name="Christ Vidyanikethann")
 
+# ✅ Only initialize DB when directly running the script
+def init_db():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS votes (
+            student_id TEXT PRIMARY KEY,
+            student_name TEXT,
+            head_boy TEXT,
+            head_girl TEXT,
+            asst_head_boy TEXT,
+            asst_head_girl TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
 if __name__ == '__main__':
+    init_db()
     app.run(host='0.0.0.0', port=5000, debug=False)
